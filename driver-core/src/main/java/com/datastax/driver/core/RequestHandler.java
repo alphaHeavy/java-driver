@@ -314,8 +314,11 @@ class RequestHandler {
                 logError(host.getSocketAddress(), e);
                 return false;
             } catch (TimeoutException e) {
+                int totalInFlight = currentPool.totalInFlight.get();
+                int connections = currentPool.connections.size();
                 // We timeout, log it but move to the next node.
-                logError(host.getSocketAddress(), new DriverException("Timeout while trying to acquire available connection (you may want to increase the driver number of per-host connections)", e));
+                logError(host.getSocketAddress(), new DriverException(
+                        "Timeout while trying to acquire available connection (you may want to increase the driver number of per-host connections) InFlight: " + totalInFlight + " Connections:" + connections, e));
                 return false;
             } catch (RuntimeException e) {
                 if (connection != null)
